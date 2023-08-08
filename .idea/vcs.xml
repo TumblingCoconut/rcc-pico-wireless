@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/dev/pico/python/input/Gamepad" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/arduino/PinChangeInterrupt" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/arduino/Servo" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/external/argumentum" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/external/cpp-base64" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/external/hash-library" vcs="Git" />
+  </component>
+</project>
