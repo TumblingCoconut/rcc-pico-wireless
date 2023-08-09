@@ -136,6 +136,39 @@ class Twist:
 		
 	def __repr__(self):
 		return f'Twist<{self.linear}, {self.angular}>'
+
+class Move:
+	def __init__(self, msg):
+		self.id_ = 74
+		self.packet_spec = (Float)
+
+		if type(msg) is Packet:
+			self.from_pack(msg)
+			return None
+		if type(msg) is tuple:
+			[self.power] = [msg[0]]
+		else:
+			[self.power] = [msg.power]
+		self.fields = [self.power]
+
+	def pack(self):
+		return Packet(self.id_,serialize(self.packet_spec, self.fields))
+	
+	@staticmethod
+	def id():
+		return 74
+	
+	def from_pack(self,p):
+		[
+			self.power
+		], _ = deserialize(
+			(Float),
+			p.data()
+		)
+		self.fields = [self.power]
+		
+	def __repr__(self):
+		return f'Power <{self.power}>'
 	
 
 class Sensor_Data:

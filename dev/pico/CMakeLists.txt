@@ -105,3 +105,5 @@ make_exec(wheadless tests/wireless_headless_test.cpp)
 # make_exec(vel_control_test tests/vel_control_test.cpp)
 # make_exec(conversions challenges/02-functions/1-conversions-sol/1-conversions-sol.cpp)
 # make_exec(blink_test tests/blink_test.cpp)
+
+make_exec(wireless_headless_test tests/wireless_headless_test.cpp)

@@ -31,6 +31,24 @@ void packet_receiver(Packet p) {
         Twist twist(p);
         #ifdef RECV_DEBUG
             printf("[RECV_DEBUG]: %s", twist.repr().c_str());
+            if (twist.linear > 1){
+                cyw43_arch_gpio_put(0, false);
+                sleep_ms(200);
+                cyw43_arch_gpio_put(0, true);
+            }
+        #endif
+        break;
+    }
+
+    case Move::id:
+    {
+        Move move(p);
+        #ifdef RECV_DEBUG
+            printf("[RECV_DEBUG]: %s", move.repr().c_str());
+            Motor motors;
+            MotorInit(&motors, RCC_ENA, RCC_ENB, 1000);
+            MotorsOn(&motors);
+            MotorPower(&motors, move.power, move.power);
         #endif
         break;
     }
@@ -138,6 +156,8 @@ int main()
     rcc_init_potentiometer();
     stdio_init_all();    
     sleep_ms(1000);
+
+
 
     //Initialize the wireless hardware
     if (cyw43_arch_init()) {

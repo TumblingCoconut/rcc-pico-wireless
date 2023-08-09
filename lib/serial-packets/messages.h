@@ -61,6 +61,17 @@ struct Twist {
 	float angular;
 };
 
+struct Move {
+	static constexpr const int32_t id = 74;
+	Move();
+	Move(const Packet&);
+	Packet pack();
+	std::string repr();
+
+	float power;
+}; 
+
+
 struct Stop {
 	static constexpr const int32_t id = 666;
 };

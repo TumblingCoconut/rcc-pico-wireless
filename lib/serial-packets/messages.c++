@@ -80,6 +80,35 @@ std::string Twist::repr()
 	return ss.str();
 }
 
+Move::Move(){
+
+}
+
+Move::Move(const Packet& p){
+	std::tie(power) = deserialize<float>(p.data());
+}
+
+Packet Move::pack(){
+		return Packet(
+		Move::id,
+		serialize<
+			float
+		>(std::make_tuple(
+			power
+		))
+	);
+	}
+
+std::string Move::repr()
+{
+	std::stringstream ss;
+	ss << "Move, Power: " << power << ">\n";
+	return ss.str();
+}
+
+
+
+
 Sensor_Data::Sensor_Data() {
 
 }
