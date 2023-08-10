@@ -11,6 +11,8 @@
 using namespace std;
 uint32_t Ts = 1000;
 float power;
+float left_power;
+float right_power;
 float theta = 0;
 
 /// @brief Demux for the incoming packets
@@ -18,7 +20,7 @@ float theta = 0;
 void packet_receiver(Packet p)
 {
     switch (p.id())
-    { // Swith on the id of the packet
+    { // Switch on the id of the packet
     case 0:
         break;
 
@@ -50,13 +52,22 @@ void packet_receiver(Packet p)
 //         Move move(p);
 // #ifdef RECV_DEBUG
 //         printf("[RECV_DEBUG]: %s", move.repr().c_str());
-//         if (power <= 100){
-//             power = move.power;
-//         }
-        
+//         power = move.power;
+
 // #endif
 //         break;
-//     }
+    // }
+    case Move::id:
+    {
+        Move move(p);
+#ifdef RECV_DEBUG
+        printf("[RECV_DEBUG]: %s", move.repr().c_str());
+        left_power = (move.left);
+        right_power = (move.right);
+
+#endif
+        break;
+    }
 
     case Position::id:
     {
@@ -211,7 +222,9 @@ int main()
         // Check if msg has come in, deserialize it, and take action dependent on which msg it is
         interface.get_msg_timeout(&packet_receiver, 10000);
         cout << "Move Power Val: " << power << "\n";
-        MotorPower(&motors, power, power);
+        cout << "Left: " << left_power << "\n";
+        cout << "right: " << right_power << "\n";
+        MotorPower(&motors, (left_power), (right_power));
 
         // Do other NON BLOCKING code here!
         sleep_ms(1000);

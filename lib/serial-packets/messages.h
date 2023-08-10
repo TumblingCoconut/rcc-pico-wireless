@@ -12,14 +12,16 @@
 
 #include <cstdint>
 
-struct Test_Inbound {
-	Test_Inbound(const Packet&);
+struct Test_Inbound
+{
+	Test_Inbound(const Packet &);
 
 	float field_1;
 	float field_2;
 };
 
-struct Test_Outbound {
+struct Test_Outbound
+{
 	static constexpr const int32_t id = 377;
 	Packet pack();
 
@@ -28,10 +30,11 @@ struct Test_Outbound {
 	float field_3;
 };
 
-struct Position {
+struct Position
+{
 	static constexpr const int32_t id = 93;
 
-	Position(const Packet&);
+	Position(const Packet &);
 
 	float x_trans, y_trans, z_trans;
 	float x_rot, y_rot, z_rot;
@@ -39,10 +42,11 @@ struct Position {
 	int32_t frame_number;
 };
 
-struct Simple_Move {
+struct Simple_Move
+{
 	static constexpr const int32_t id = 66;
 
-	Simple_Move(const Packet&);
+	Simple_Move(const Packet &);
 
 	float distance;
 	float curvature;
@@ -50,10 +54,11 @@ struct Simple_Move {
 	int32_t trans_id;
 };
 
-struct Twist {
+struct Twist
+{
 	static constexpr const int32_t id = 88;
 	Twist();
-	Twist(const Packet&);
+	Twist(const Packet &);
 	Packet pack();
 	std::string repr();
 
@@ -61,22 +66,36 @@ struct Twist {
 	float angular;
 };
 
-struct Move {
-	static constexpr const int32_t id = 74;
+// struct Move
+// {
+// 	static constexpr const int32_t id = 74;
+// 	Move();
+// 	Move(const Packet &);
+// 	Packet pack();
+// 	std::string repr();
+
+// 	float power;
+// };
+
+struct Move
+{
+	static constexpr const int32_t id = 80;
 	Move();
-	Move(const Packet&);
+	Move(const Packet &);
 	Packet pack();
 	std::string repr();
 
-	float power;
-}; 
+	float left;
+	float right;
+};
 
-
-struct Stop {
+struct Stop
+{
 	static constexpr const int32_t id = 666;
 };
 
-struct Move_Feedback {
+struct Move_Feedback
+{
 	static constexpr const int32_t id = 42;
 
 	Packet pack();
@@ -87,12 +106,13 @@ struct Move_Feedback {
 	int32_t trans_id;
 };
 
-struct Sensor_Data {
+struct Sensor_Data
+{
 	static constexpr const int32_t id = 501;
 	Packet pack();
 	std::string repr();
 	Sensor_Data();
-	Sensor_Data(const Packet&);
+	Sensor_Data(const Packet &);
 
 	int32_t time;
 	int32_t potval;
