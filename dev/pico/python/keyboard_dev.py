@@ -34,13 +34,13 @@ def on_press(key):
         if (key.char == 'a'):
             print("a was pressed")
             # make new message
-            t = Move((90.0, 100.0))
+            t = Move((75.0, 100.0))
             pout = t.pack()
             c.outbound.put(pout)
         if (key.char == 'd'):
             print("d was pressed")
             # make new message
-            t = Move((100.0, 90.0))
+            t = Move((100.0, 75.0))
             # t = Twist((1.0, 50.0))
             pout = t.pack()
             c.outbound.put(pout)
