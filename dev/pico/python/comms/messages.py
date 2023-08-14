@@ -191,6 +191,40 @@ class Move:
         return f'directions <{self.left}, {self.right}>'
 
 
+class State:
+    def __init__(self, msg):
+        self.id_ = 23
+        self.packet_spec = (Float,)
+
+        if type(msg) is Packet:
+            self.from_pack(msg)
+            return None
+        if type(msg) is tuple:
+            [self.wireless] = [msg[0],]
+        else:
+            [self.wireless] = [msg.wireless,]
+        self.fields = [self.wireless,]
+
+    def pack(self):
+        return Packet(self.id_, serialize(self.packet_spec, self.fields))
+
+    @staticmethod
+    def id():
+        return 23
+
+    def from_pack(self, p):
+        [
+            self.autonomous
+        ], _ = deserialize(
+            (Float),
+            p.data()
+        )
+        self.fields = [self.wireless]
+
+    def __repr__(self):
+        return f'directions <{self.wireless}>'
+
+
 class Sensor_Data:
     def __init__(self, msg):
         self.id_ = 501

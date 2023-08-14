@@ -3,10 +3,9 @@
 #include <math.h>
 #include <stdlib.h>
 #include "rcc_pins.h"
-
 using namespace std;
 
-typedef struct 
+typedef struct
 {
     uint gpio;
     uint slice;
@@ -19,11 +18,11 @@ typedef struct
 
 typedef struct
 {
-    Servo left; //ENA pin
-    Servo right; //ENB pin
-    uint in1; //left motor dir pins
+    Servo left;  // ENA pin
+    Servo right; // ENB pin
+    uint in1;    // left motor dir pins
     uint in2;
-    uint in3; //right motor dir pins
+    uint in3; // right motor dir pins
     uint in4;
 } Motor;
 
@@ -35,8 +34,8 @@ uint32_t pwm_set_freq_duty(uint slice_num, uint chan, uint32_t f, int d)
     {
         divider16 = 16;
     }
-    uint32_t wrap = clock* 16 / divider16 / f - 1;
-    pwm_set_clkdiv_int_frac(slice_num, divider16/16, divider16 & 0xF);
+    uint32_t wrap = clock * 16 / divider16 / f - 1;
+    pwm_set_clkdiv_int_frac(slice_num, divider16 / 16, divider16 & 0xF);
     pwm_set_wrap(slice_num, wrap);
     pwm_set_chan_level(slice_num, chan, wrap * d / 100);
     return wrap;
@@ -52,7 +51,7 @@ void pwm_set_duty(uint gpio, int d)
 {
     uint slice_num = pwm_gpio_to_slice_num(gpio);
     uint chan = pwm_gpio_to_channel(gpio);
-    pwm_set_chan_level(slice_num, chan, pwm_get_wrap(slice_num)*d/100);
+    pwm_set_chan_level(slice_num, chan, pwm_get_wrap(slice_num) * d / 100);
 }
 
 void pwm_set_dutyH(uint slice_num, uint chan, int d)
@@ -62,9 +61,9 @@ void pwm_set_dutyH(uint slice_num, uint chan, int d)
 
 void pwm_set_dutyF(uint slice_num, uint chan, float d)
 {
-    int frac = static_cast<int>(d*10000);
-    frac = min(max(0,frac), 10000);
-    pwm_set_chan_level(slice_num, chan, pwm_get_wrap(slice_num)*frac/10000);
+    int frac = static_cast<int>(d * 10000);
+    frac = min(max(0, frac), 10000);
+    pwm_set_chan_level(slice_num, chan, pwm_get_wrap(slice_num) * frac / 10000);
 }
 
 void ServoInit(Servo *s, uint gpio, bool invert, uint freq)
@@ -81,14 +80,13 @@ void ServoInit(Servo *s, uint gpio, bool invert, uint freq)
     s->speed = 0;
     s->resolution = pwm_set_freq_duty(s->slice, s->chan, freq, 0);
     pwm_set_dutyH(s->slice, s->chan, 0);
-    if(s->chan)
+    if (s->chan)
     {
         pwm_set_output_polarity(s->slice, false, invert);
     }
     else
     {
         pwm_set_output_polarity(s->slice, invert, false);
-
     }
     s->invert = invert;
 }
@@ -107,10 +105,10 @@ void ServoOff(Servo *s)
 
 void ServoPosition(Servo *s, uint p)
 {
-    pwm_set_dutyH(s->slice, s->chan, p*10 + 250);
+    pwm_set_dutyH(s->slice, s->chan, p * 10 + 250);
 }
 
-//Turn all motors on
+// Turn all motors on
 void MotorsOn(Motor *m)
 {
     pwm_set_enabled(m->left.slice, true);
@@ -119,7 +117,7 @@ void MotorsOn(Motor *m)
     m->right.on = true;
 }
 
-//Shut all motors off
+// Shut all motors off
 void MotorsOff(Motor *m)
 {
 
@@ -134,7 +132,7 @@ void MotorsOff(Motor *m)
     gpio_put(m->in4, false);
 }
 
-//Initialize the input gpio for the motor
+// Initialize the input gpio for the motor
 void MotorInitGPIO(uint gpio)
 {
     gpio_init(gpio);
@@ -169,28 +167,27 @@ void MotorInit(Motor *m, uint gpio_l, uint gpio_r, uint freq)
     m->in4 = RCC_IN4;
 }
 
-
 void MotorPower(Motor *m, int lp, int rp)
 {
     //--Handle Directionality--//
-    if(lp < 0)
+    if (lp < 0)
     {
         gpio_put(m->in1, 0);
         gpio_put(m->in2, 1);
     }
-    else 
-    { 
+    else
+    {
         gpio_put(m->in1, 1);
         gpio_put(m->in2, 0);
     }
 
-    if(rp < 0)
+    if (rp < 0)
     {
         gpio_put(m->in3, 0);
         gpio_put(m->in4, 1);
     }
-    else 
-    { 
+    else
+    {
         gpio_put(m->in3, 1);
         gpio_put(m->in4, 0);
     }
@@ -199,4 +196,57 @@ void MotorPower(Motor *m, int lp, int rp)
     // pwm_set_dutyF(m->right.slice, m->right.chan, std::abs(rp));
     pwm_set_duty(m->left.gpio, abs(lp));
     pwm_set_duty(m->right.gpio, abs(rp));
+}
+
+typedef struct
+{
+    Servo blue;
+    Servo red;
+    Servo green;
+
+} RGBLED;
+
+void LEDinit(RGBLED *m, uint blue, uint red, uint green, uint freq)
+{
+    MotorInitGPIO(blue);
+    MotorInitGPIO(red);
+    MotorInitGPIO(green);
+    gpio_set_function(blue, GPIO_FUNC_PWM);
+    gpio_set_function(red, GPIO_FUNC_PWM);
+    gpio_set_function(green, GPIO_FUNC_PWM);
+    m->blue.slice = pwm_gpio_to_slice_num(blue);
+    m->red.slice = pwm_gpio_to_slice_num(red);
+    m->green.slice = pwm_gpio_to_slice_num(green);
+
+    m->blue.chan = pwm_gpio_to_channel(blue);
+    m->red.chan = pwm_gpio_to_channel(red);
+    m->green.chan = pwm_gpio_to_channel(green);
+
+    m->blue.gpio = blue;
+    m->red.gpio = red;
+    m->green.gpio = green;
+
+    m->blue.resolution = pwm_set_freq_duty(m->blue.slice, m->blue.chan, freq, 0);
+    m->red.resolution = pwm_set_freq_duty(m->red.slice, m->red.chan, freq, 0);
+    m->green.resolution = pwm_set_freq_duty(m->green.slice, m->green.chan, freq, 0);
+}
+
+// Turn all leds on
+void LEDOn(RGBLED *m)
+{
+    pwm_set_enabled(m->blue.slice, true);
+    pwm_set_enabled(m->red.slice, true);
+    pwm_set_enabled(m->green.slice, true);
+    m->blue.on = true;
+    m->red.on = true;
+    m->green.on = true;
+}
+
+void LEDPower(RGBLED *m, int blue, int red, int green)
+{
+    // pwm_set_dutyF(m->left.slice, m->left.chan, std::abs(lp));
+    // pwm_set_dutyF(m->right.slice, m->right.chan, std::abs(rp));
+    pwm_set_duty(m->blue.gpio, abs(blue));
+    pwm_set_duty(m->red.gpio, abs(red));
+    pwm_set_duty(m->green.gpio, abs(green));
 }

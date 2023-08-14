@@ -14,6 +14,8 @@ float power;
 float left_power;
 float right_power;
 float theta = 0;
+float wireless = 1;
+
 
 /// @brief Demux for the incoming packets
 /// @param p : A message in packet form
@@ -47,16 +49,16 @@ void packet_receiver(Packet p)
         break;
     }
 
-//     case Move::id:
-//     {
-//         Move move(p);
-// #ifdef RECV_DEBUG
-//         printf("[RECV_DEBUG]: %s", move.repr().c_str());
-//         power = move.power;
+        //     case Move::id:
+        //     {
+        //         Move move(p);
+        // #ifdef RECV_DEBUG
+        //         printf("[RECV_DEBUG]: %s", move.repr().c_str());
+        //         power = move.power;
 
-// #endif
-//         break;
-    // }
+        // #endif
+        //         break;
+        // }
     case Move::id:
     {
         Move move(p);
@@ -65,6 +67,15 @@ void packet_receiver(Packet p)
         left_power = (move.left);
         right_power = (move.right);
 
+#endif
+        break;
+    }
+    case State::id:
+    {
+        State state(p);
+#ifdef RECV_DEBUG
+        printf("[RECV_DEBUG]: %s", state.repr().c_str());
+        wireless = (state.wireless);
 #endif
         break;
     }
@@ -201,6 +212,10 @@ int main()
     MotorInit(&motors, RCC_ENA, RCC_ENB, 1000);
     MotorsOn(&motors);
 
+    RGBLED leds;
+    LEDinit(&leds, RCC_LED_BLUE, RCC_LED_RED, RCC_LED_GREEN, 1000);
+    LEDOn(&leds);
+
     // Instantiate wireless interface class
     WirelessMsgInterface interface(COMP_IP, PICO_IP, TO_COMP_PORT, TO_PICO_PORT);
     interface.setup_wireless_interface();
@@ -224,8 +239,19 @@ int main()
         cout << "Move Power Val: " << power << "\n";
         cout << "Left: " << left_power << "\n";
         cout << "right: " << right_power << "\n";
+        cout << "wireless: " << wireless << "\n";
+        if (wireless == 1.0)
+        {
+            LEDPower(&leds, 100, 0, 0);
+            MotorPower(&motors, (left_power * .998), (right_power));
+        }
+        else if (wireless == 0.0)
+        {
+            LEDPower(&leds, 0, 100, 0);
+            MotorPower(&motors, (0 * .998), (0));
+        }
+
         
-        MotorPower(&motors, (left_power * .998), (right_power));
 
         // Do other NON BLOCKING code here!
         sleep_ms(1000);

@@ -3,11 +3,13 @@ from pynput.keyboard import Key
 from comms.controller import WirelessController, WirelessInterface
 from comms.messages import Twist
 from comms.messages import Move
+from comms.messages import State
 
 c = WirelessController(WirelessInterface)
 c.start_inbound()
 c.start_outbound()
 
+current_state = "wireless"
 
 def on_press(key):
     try:
@@ -50,7 +52,18 @@ def on_press(key):
             # t = Twist((1.0, 50.0))
             pout = t.pack()  
             c.outbound.put(pout)
-
+        if (key.char == 'r'):
+            print("r was pressed")
+            t = State((1,0,))
+            # t = Twist((1.0, 50.0))
+            pout = t.pack()  
+            c.outbound.put(pout)
+        if (key.char == 't'):
+            print("t was pressed")
+            t = State((0,0,))
+            # t = Twist((1.0, 50.0))
+            pout = t.pack()  
+            c.outbound.put(pout)
 
 
     except AttributeError as e:

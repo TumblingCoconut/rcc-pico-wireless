@@ -145,6 +145,33 @@ std::string Move::repr()
 	return ss.str();
 }
 
+State::State(){
+
+}
+
+State::State(const Packet &p)
+{
+	std::tie(wireless) = deserialize<float>(p.data());
+}
+
+Packet State::pack()
+{
+	return Packet(
+		State::id,
+		serialize<
+			float
+		>(std::make_tuple(
+			wireless)));
+}
+
+std::string State::repr()
+{
+	std::stringstream ss;
+	ss << "Move<wireless: " << wireless << ">\n";
+	return ss.str();
+}
+
+
 Sensor_Data::Sensor_Data()
 {
 }

@@ -89,6 +89,17 @@ struct Move
 	float right;
 };
 
+struct State
+{
+	static constexpr const int32_t id = 23;
+	State();
+	State(const Packet &);
+	Packet pack();
+	std::string repr();
+
+	float wireless;
+};
+
 struct Stop
 {
 	static constexpr const int32_t id = 666;

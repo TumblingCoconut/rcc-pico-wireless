@@ -17,3 +17,7 @@
 // Optical Interrupt sensors for Odom
 #define RCC_LEFT_ENCODER_PIN_INT  21
 #define RCC_RIGHT_ENCODER_PIN_INT 13
+// LEDs
+#define RCC_LED_BLUE 0
+#define RCC_LED_RED 1
+#define RCC_LED_GREEN 2
