@@ -224,7 +224,8 @@ int main()
         cout << "Move Power Val: " << power << "\n";
         cout << "Left: " << left_power << "\n";
         cout << "right: " << right_power << "\n";
-        MotorPower(&motors, (left_power * .998gi5), (right_power));
+        
+        MotorPower(&motors, (left_power * .998), (right_power));
 
         // Do other NON BLOCKING code here!
         sleep_ms(1000);
