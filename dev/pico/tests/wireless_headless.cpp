@@ -16,6 +16,12 @@ float right_power;
 float theta = 0;
 float wireless = 1;
 
+typedef enum{
+    INITIAL,
+    WIRELESS,
+    SEARCH,
+    TRACK
+} state_t;
 
 /// @brief Demux for the incoming packets
 /// @param p : A message in packet form
@@ -188,6 +194,7 @@ bool send_test_message(repeating_timer_t *t)
     return true;
 }
 
+
 int main()
 {
     uint delay_length;
@@ -216,6 +223,15 @@ int main()
     LEDinit(&leds, RCC_LED_BLUE, RCC_LED_RED, RCC_LED_GREEN, 1000);
     LEDOn(&leds);
 
+    // Initialize lidar
+    VL53L0X lidar;
+    rcc_init_lidar(&lidar);
+
+    // Initialize Servo motor
+    Servo s3;
+    ServoInit(&s3, 18, false, 50);
+    ServoOn(&s3);
+
     // Instantiate wireless interface class
     WirelessMsgInterface interface(COMP_IP, PICO_IP, TO_COMP_PORT, TO_PICO_PORT);
     interface.setup_wireless_interface();
@@ -232,6 +248,9 @@ int main()
     address = ipaddr_ntoa(&interface.lwip_infra.pico_ip);
     printf("This PICO's IP address is: %s\n", address);
 
+    //rename state_name to something more informative
+    state_t state = INITIAL;
+
     while (true)
     {
         // Check if msg has come in, deserialize it, and take action dependent on which msg it is
@@ -240,21 +259,49 @@ int main()
         cout << "Left: " << left_power << "\n";
         cout << "right: " << right_power << "\n";
         cout << "wireless: " << wireless << "\n";
-        if (wireless == 1.0)
-        {
-            LEDPower(&leds, 100, 0, 0);
-            MotorPower(&motors, (left_power * .998), (right_power));
-        }
-        else if (wireless == 0.0)
-        {
-            LEDPower(&leds, 0, 100, 0);
-            MotorPower(&motors, (0 * .998), (0));
-        }
+        
+        
+
+        ServoPosition(&s3, 50); // face servo forward
+        uint16_t dist = getFastReading(&lidar); // get lidar reading
+        switch(state){
+            case INITIAL:
+                if (wireless == 1.0)
+                 {
+                    LEDPower(&leds, 100, 0, 0);
+                    MotorPower(&motors, (left_power * .998), (right_power));
+                }
+                else if (wireless == 0.0)
+                {
+
+                    LEDPower(&leds, 0, 100, 0);
+                    state = SEARCH;
+                }
+                break;
+            case SEARCH:
+                MotorPower(&motors, 70, -(.983 * 70));  // %motor speed 
+                if (dist <= 500) {
+                    state = TRACK;
+                }
+                break;
+            case TRACK: 
+                if (wireless == 1.0)
+                 {
+                    state = INITIAL;
+                }
+                if (dist > 400){
+                    MotorPower(&motors, 70, 70);  // %motor speed 
+                }
+                if (dist < 300){
+                    MotorPower(&motors, -70, -70);  // %motor speed 
+                }
+                break;
+            }
+
 
         
 
         // Do other NON BLOCKING code here!
-        sleep_ms(1000);
         cout << address << "\n";
     }
 
